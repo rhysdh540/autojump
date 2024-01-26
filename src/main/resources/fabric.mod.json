@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
-  "id": "modid",
+  "id": "aj",
   "version": "${version}",
-  "name": "Example Mod",
-  "description": "This is an example description! Tell everyone what your mod is about!",
+  "name": "autojump",
+  "description": "me when jump",
   "authors": [
-    "Me!"
+    "rdh"
   ],
   "contact": {
     "homepage": "https://legacyfabric.net/",
@@ -16,17 +16,14 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "net.fabricmc.example.ExampleMod"
+      "dev.rdh.aj.AutoJump"
     ]
   },
   "mixins": [
-    "modid.mixins.json"
+    "aj.mixins.json"
   ],
   "depends": {
     "fabricloader": ">=0.14.19",
     "minecraft": "1.8.9"
-  },
-  "suggests": {
-    "another-mod": "*"
   }
 }
