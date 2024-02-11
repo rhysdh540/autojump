@@ -1,6 +1,6 @@
 package dev.rdh.aj;
 
-import net.fabricmc.api.ModInitializer;
+import net.fabricmc.api.ClientModInitializer;
 import net.legacyfabric.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.legacyfabric.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import org.apache.logging.log4j.LogManager;
@@ -9,6 +9,7 @@ import org.lwjgl.input.Keyboard;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ChatScreen;
+import net.minecraft.client.gui.screen.GameMenuScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.option.KeyBinding;
@@ -16,7 +17,7 @@ import net.minecraft.client.option.KeyBinding;
 import java.util.Arrays;
 import java.util.List;
 
-public class AutoJump implements ModInitializer {
+public class AutoJump implements ClientModInitializer {
 	private static final MinecraftClient MC = MinecraftClient.getInstance();
 
 	private static final KeyBinding AUTOJUMP = KeyBindingHelper.registerKeyBinding(new KeyBinding("key.aj.toggle_aj", Keyboard.KEY_BACKSLASH, "key.categories.movement"));
@@ -28,14 +29,14 @@ public class AutoJump implements ModInitializer {
 	private static final Logger LOGGER = LogManager.getLogger("AutoJump");
 
 	@Override
-	public void onInitialize() {
+	public void onInitializeClient() {
 		ClientTickEvents.START_WORLD_TICK.register(client -> {
-			if(AUTOJUMP.isPressed()) {
+			if(AUTOJUMP.wasPressed()) {
 				ajEnabled = !ajEnabled;
 				LOGGER.info("AutoJump: {}", ajEnabled ? "Enabled" : "Disabled");
 			}
 
-			if(INVWALK.isPressed()) {
+			if(INVWALK.wasPressed()) {
 				iwEnabled = !iwEnabled;
 				LOGGER.info("InvWalk: {}", iwEnabled ? "Enabled" : "Disabled");
 			}
@@ -56,16 +57,19 @@ public class AutoJump implements ModInitializer {
 		}
 	}
 
+	private static List<KeyBinding> keys = null;
+
 	private void tickInvWalk() {
+		if(keys == null) {
+			keys = Arrays.asList(MC.options.forwardKey, MC.options.backKey, MC.options.leftKey, MC.options.rightKey, MC.options.jumpKey, MC.options.sneakKey, MC.options.sprintKey);
+		}
 		Screen screen = MC.currentScreen;
-		if(screen instanceof ChatScreen) {
+		if(screen instanceof ChatScreen || screen instanceof GameMenuScreen) {
 			return;
 		}
 
-		List<KeyBinding> keys = Arrays.asList(MC.options.forwardKey, MC.options.backKey, MC.options.leftKey, MC.options.rightKey, MC.options.jumpKey, MC.options.sneakKey);
 		for(KeyBinding key : keys) {
-			int code = key.getCode();
-			KeyBinding.setKeyPressed(code, GameOptions.isPressed(key));
+			KeyBinding.setKeyPressed(key.getCode(), GameOptions.isPressed(key));
 		}
 	}
 }

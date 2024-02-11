@@ -19,7 +19,7 @@ jobs:
       - name: Setup Java JDK
         uses: actions/setup-java@v4.0.0
         with:
-          distribution: "temurin"
+          distribution: zulu
           java-version: ${{ matrix.java }}
       - name: Grant execute permission
         run: chmod +x ./gradlew
@@ -28,5 +28,5 @@ jobs:
       - name: Upload a Build Artifact
         uses: actions/upload-artifact@v4.3.0
         with: 
-          name: modid
+          name: autojump
           path: build/libs/*.jar

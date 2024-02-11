@@ -1,7 +1,6 @@
 plugins {
 	id "fabric-loom" version "1.5-SNAPSHOT"
 	id "legacy-looming" version "1.5-SNAPSHOT" // Version must be the same as fabric-loom's
-	id "maven-publish"
 }
 
 base.archivesName = project.archives_base_name
@@ -11,15 +10,9 @@ group = project.maven_group
 repositories {}
 
 loom {
-	// Only needed for versions not available from vanilla launcher by default.
-	// customMinecraftManifest.set("https://meta.legacyfabric.net/v2/manifest/${minecraft_version}")
-
-	// Required by 1.7.x
-	// runs {
-	// 	client {
-	// 		programArgs "--userProperties", "{}"
-	// 	}
-	// }
+	runs {
+		remove server
+	}
 }
 
 dependencies {
@@ -67,20 +60,5 @@ java {
 jar {
 	from("LICENSE") {
 		rename { "${it}_${base.archivesName.get()}" }
-	}
-}
-
-// Configure the maven publication
-publishing {
-	publications {
-		mavenJava(MavenPublication) {
-			from components.java
-		}
-	}
-
-	// Select the repositories you want to publish to
-	repositories {
-		// Uncomment to publish to the local maven
-		// mavenLocal()
 	}
 }
