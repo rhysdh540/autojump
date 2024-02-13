@@ -4,6 +4,7 @@
   "package": "dev.rdh.aj.mixin",
   "compatibilityLevel": "JAVA_8",
   "client": [
+    "KeyBindingMixinSquared"
   ],
   "injectors": {
     "defaultRequire": 1
