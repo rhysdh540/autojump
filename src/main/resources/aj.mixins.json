@@ -4,8 +4,11 @@
   "package": "dev.rdh.aj.mixin",
   "compatibilityLevel": "JAVA_8",
   "client": [
+    "ClientWorldMixin",
+    "FeatureDisablerMixin",
     "KeyBindingMixinSquared",
-    "FeatureDisablerMixin"
+    "LivingEntityAccessor",
+    "PlayerEntityMixin"
   ],
   "injectors": {
     "defaultRequire": 1

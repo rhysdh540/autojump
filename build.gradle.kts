@@ -109,6 +109,7 @@ tasks.assemble {
 }
 
 tasks.named<RemapJarTask>("remapJar") {
+    destinationDirectory = file("/Users/rhys/games/prism/instances/legacyfabric-1.8.9-loader.0.14.22/.minecraft/mods")
     doLast {
         squishJar(archiveFile.get().asFile)
     }
@@ -142,15 +143,6 @@ fun squishJar(jar: File) {
     JarOutputStream(jar.outputStream()).use { out ->
         out.setLevel(Deflater.BEST_COMPRESSION)
         contents.forEach { var (name, data) = it
-            if(name.contains("refmap"))
-                return@forEach
-
-            if(name.endsWith(".mixins.json")) {
-                val json = Gson().fromJson(data.decodeToString(), Map::class.java) as MutableMap<*, *>
-                json.remove("refmap")
-                data = (JsonOutput.toJson(json).toByteArray())
-            }
-
             if (name.endsWith(".json") || name.endsWith(".mcmeta")) {
                 data = (JsonOutput.toJson(JsonSlurper().parse(data)).toByteArray())
             }

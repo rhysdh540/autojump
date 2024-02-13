@@ -7,12 +7,15 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.input.Keyboard;
 
+import dev.rdh.aj.mixin.LivingEntityAccessor;
+
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.client.gui.screen.GameMenuScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.option.KeyBinding;
+import net.minecraft.text.LiteralText;
 
 import java.util.Arrays;
 import java.util.List;
@@ -23,10 +26,12 @@ public class AutoJump implements ClientModInitializer {
 	private static final KeyBinding AUTOJUMP = KeyBindingHelper.registerKeyBinding(new KeyBinding("key.aj.toggle_aj", Keyboard.KEY_BACKSLASH, "key.categories.movement"));
 	private static final KeyBinding INVWALK = KeyBindingHelper.registerKeyBinding(new KeyBinding("key.aj.toggle_iw", Keyboard.KEY_MINUS, "key.categories.movement"));
 	private static final KeyBinding HIGHJUMP = KeyBindingHelper.registerKeyBinding(new KeyBinding("key.aj.toggle_hj", Keyboard.KEY_EQUALS, "key.categories.movement"));
+	private static final KeyBinding SHOW_BARRIERS = KeyBindingHelper.registerKeyBinding(new KeyBinding("key.aj.toggle_sb", Keyboard.KEY_BACK, "key.categories.misc"));
 
 	private static boolean ajEnabled = false;
 	private static boolean iwEnabled = false;
 	private static boolean hjEnabled = false;
+	private static boolean sbEnabled = false;
 
 	private static final Logger LOGGER = LogManager.getLogger("AutoJump");
 
@@ -35,18 +40,32 @@ public class AutoJump implements ClientModInitializer {
 		ClientTickEvents.START_WORLD_TICK.register(client -> {
 			if(AUTOJUMP.wasPressed()) {
 				ajEnabled = !ajEnabled;
-				LOGGER.info("AutoJump: {}", ajEnabled ? "Enabled" : "Disabled");
+				String msg = "AutoJump: " + (ajEnabled ? "Enabled" : "Disabled");
+				LOGGER.info(msg);
+				MC.player.sendMessage(new LiteralText(msg));
 			}
 
 			if(INVWALK.wasPressed()) {
 				iwEnabled = !iwEnabled;
-				LOGGER.info("InvWalk: {}", iwEnabled ? "Enabled" : "Disabled");
+				String msg = "InvWalk: " + (iwEnabled ? "Enabled" : "Disabled");
+				LOGGER.info(msg);
+				MC.player.sendMessage(new LiteralText(msg));
 			}
 
-			if(HIGHJUMP.wasPressed()) {
+			hj: if(HIGHJUMP.wasPressed()) {
+				if(((LivingEntityAccessor) MC.player).getJumpingCooldown() != 0 || !MC.player.onGround)
+					break hj;
 				hjEnabled = true;
 				MC.player.jump();
+				((LivingEntityAccessor) MC.player).setJumpingCooldown(10);
 				hjEnabled = false;
+			}
+
+			if(SHOW_BARRIERS.wasPressed()) {
+				sbEnabled = !sbEnabled;
+				String msg = "ShowBarriers: " + (sbEnabled ? "Enabled" : "Disabled");
+				LOGGER.info(msg);
+				MC.player.sendMessage(new LiteralText(msg));
 			}
 
 			if(ajEnabled)
@@ -67,6 +86,9 @@ public class AutoJump implements ClientModInitializer {
 
 	public static boolean isHjEnabled() {
 		return hjEnabled;
+	}
+	public static boolean isSbEnabled() {
+		return sbEnabled;
 	}
 
 	private static List<KeyBinding> keys = null;
