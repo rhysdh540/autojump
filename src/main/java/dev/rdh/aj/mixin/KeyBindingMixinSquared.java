@@ -10,7 +10,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import net.minecraft.client.option.KeyBinding;
 
 @Mixin(value = KeyBinding.class, priority = 1001)
-@SuppressWarnings({"MixinAnnotationTarget", "InvalidMemberReference", "CancellableInjectionUsage"})
 public class KeyBindingMixinSquared {
 
 	@TargetHandler(
@@ -20,7 +19,9 @@ public class KeyBindingMixinSquared {
 	@Inject(
 			method = "@MixinSquared:Handler",
 			at = @At("HEAD"),
-			cancellable = true
+			cancellable = true,
+			require = 0,
+			remap = false
 	)
 	private void aj$noAxolotlClientYouMayNotTurnOffInvWalk(CallbackInfoReturnable<Boolean> cir, CallbackInfo ci) {
 		ci.cancel();

@@ -22,9 +22,11 @@ public class AutoJump implements ClientModInitializer {
 
 	private static final KeyBinding AUTOJUMP = KeyBindingHelper.registerKeyBinding(new KeyBinding("key.aj.toggle_aj", Keyboard.KEY_BACKSLASH, "key.categories.movement"));
 	private static final KeyBinding INVWALK = KeyBindingHelper.registerKeyBinding(new KeyBinding("key.aj.toggle_iw", Keyboard.KEY_MINUS, "key.categories.movement"));
+	private static final KeyBinding HIGHJUMP = KeyBindingHelper.registerKeyBinding(new KeyBinding("key.aj.toggle_hj", Keyboard.KEY_EQUALS, "key.categories.movement"));
 
 	private static boolean ajEnabled = false;
 	private static boolean iwEnabled = false;
+	private static boolean hjEnabled = false;
 
 	private static final Logger LOGGER = LogManager.getLogger("AutoJump");
 
@@ -41,6 +43,12 @@ public class AutoJump implements ClientModInitializer {
 				LOGGER.info("InvWalk: {}", iwEnabled ? "Enabled" : "Disabled");
 			}
 
+			if(HIGHJUMP.wasPressed()) {
+				hjEnabled = true;
+				MC.player.jump();
+				hjEnabled = false;
+			}
+
 			if(ajEnabled)
 				tickAutoJump();
 			if(iwEnabled)
@@ -55,6 +63,10 @@ public class AutoJump implements ClientModInitializer {
 				MC.player.getBoundingBox().offset(0.0, -0.5, 0.0).expand(-0.001, 0.0, -0.001)).isEmpty()) {
 			MC.player.jump();
 		}
+	}
+
+	public static boolean isHjEnabled() {
+		return hjEnabled;
 	}
 
 	private static List<KeyBinding> keys = null;
