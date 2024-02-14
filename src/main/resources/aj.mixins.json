@@ -4,7 +4,6 @@
   "package": "dev.rdh.aj.mixin",
   "compatibilityLevel": "JAVA_8",
   "client": [
-    "ClientWorldMixin",
     "FeatureDisablerMixin",
     "KeyBindingMixinSquared",
     "LivingEntityAccessor",

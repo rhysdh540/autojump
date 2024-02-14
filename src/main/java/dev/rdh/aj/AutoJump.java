@@ -6,12 +6,15 @@ import org.lwjgl.input.Keyboard;
 import dev.rdh.aj.Setting.ChatMessageSetting;
 import dev.rdh.aj.mixin.LivingEntityAccessor;
 
+import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.client.gui.screen.GameMenuScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.particle.ParticleType;
+import net.minecraft.util.math.BlockPos;
 
 import java.util.Arrays;
 import java.util.List;
@@ -29,6 +32,7 @@ public class AutoJump implements ClientModInitializer {
 			MC.player.jump();
 		}
 	});
+
 	public static final Setting INVWALK = new ChatMessageSetting("InvWalk", Keyboard.KEY_MINUS, "movement", iw -> {
 		Screen screen = MC.currentScreen;
 		if(screen instanceof ChatScreen || screen instanceof GameMenuScreen) {
@@ -43,6 +47,7 @@ public class AutoJump implements ClientModInitializer {
 			KeyBinding.setKeyPressed(key.getCode(), GameOptions.isPressed(key));
 		}
 	});
+
 	public static final Setting HIGHJUMP = new Setting("HighJump", Keyboard.KEY_EQUALS, "movement",
 			hj -> {
 				if(((LivingEntityAccessor) MC.player).getJumpingCooldown() != 0 || !MC.player.onGround)
@@ -51,7 +56,22 @@ public class AutoJump implements ClientModInitializer {
 				((LivingEntityAccessor) MC.player).setJumpingCooldown(10);
 				hj.disable();
 			});
-	public static final Setting SHOW_BARRIERS = new ChatMessageSetting("ShowBarriers", Keyboard.KEY_BACK, "misc");
+
+	public static final Setting SHOW_BARRIERS = new ChatMessageSetting("ShowBarriers", Keyboard.KEY_BACK, "misc", (sb, world) -> {
+		int radius = 5;
+		BlockPos playerPos = MC.player.getBlockPos();
+		for(int x = -radius; x <= radius; x++) {
+			for(int y = -radius; y <= radius; y++) {
+				for(int z = -radius; z <= radius; z++) {
+					BlockPos pos = playerPos.add(x, y, z);
+					if(world.getBlockState(pos).getBlock() == Blocks.BARRIER) {
+						world.addParticle(ParticleType.BARRIER, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 0, 0, 0);
+					}
+				}
+			}
+		}
+	});
+
 	public static final Setting NOWEB = new ChatMessageSetting("NoWeb", Keyboard.KEY_SEMICOLON, "movement");
 
 	@Override

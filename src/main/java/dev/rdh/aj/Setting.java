@@ -5,8 +5,10 @@ import net.legacyfabric.fabric.api.client.keybinding.v1.KeyBindingHelper;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.text.LiteralText;
 
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class Setting {
@@ -16,9 +18,9 @@ public class Setting {
 	public final KeyBinding keyBinding;
 	private boolean enabled;
 
-	private final Consumer<Setting> action;
+	private final BiConsumer<Setting, ClientWorld> action;
 
-	public Setting(String name, int keyCode, String category, Consumer<Setting> action) {
+	public Setting(String name, int keyCode, String category, BiConsumer<Setting, ClientWorld> action) {
 		this.name = name;
 		this.enabled = false;
 		this.action = action;
@@ -28,11 +30,15 @@ public class Setting {
 
 		this.keyBinding = KeyBindingHelper.registerKeyBinding(new KeyBinding(key, keyCode, "key.categories." + category));
 
-		ClientTickEvents.START_WORLD_TICK.register(client -> this.tick());
+		ClientTickEvents.START_WORLD_TICK.register(this::tick);
+	}
+
+	public Setting(String name, int keyCode, String category, Consumer<Setting> action) {
+		this(name, keyCode, category, (setting, world) -> action.accept(setting));
 	}
 
 	public Setting(String name,int keyCode, String category) {
-		this(name, keyCode, category, setting -> {});
+		this(name, keyCode, category, (setting, world) -> {});
 	}
 
 	public boolean pressed() {
@@ -59,23 +65,27 @@ public class Setting {
 		this.enabled = !this.enabled;
 	}
 
-	public void tick() {
+	public void tick(ClientWorld world) {
 		if(this.pressed()) {
 			this.toggle();
 		}
 		if(this.enabled) {
-			this.action.accept(this);
+			this.action.accept(this, world);
 		}
 	}
 
 	public static class ChatMessageSetting extends Setting {
 
-		public ChatMessageSetting(String name, int keyCode, String category, Consumer<Setting> action) {
+		public ChatMessageSetting(String name, int keyCode, String category, BiConsumer<Setting, ClientWorld> action) {
 			super(name, keyCode, category, action);
 		}
 
 		public ChatMessageSetting(String name, int keyCode, String category) {
 			super(name, keyCode, category);
+		}
+
+		public ChatMessageSetting(String name, int keyCode, String category, Consumer<Setting> action) {
+			super(name, keyCode, category, action);
 		}
 
 		private void sendMessage() {
