@@ -17,7 +17,7 @@ import net.minecraft.world.World;
 public class CobwebBlockMixin {
 	@Inject(method = "onEntityCollision", at = @At("HEAD"), cancellable = true)
 	private void aj$disableEntityCollision(World world, BlockPos pos, BlockState state, Entity entity, CallbackInfo ci) {
-		if(AutoJump.isNwEnabled()) {
+		if(AutoJump.NOWEB.enabled()) {
 			ci.cancel();
 		}
 	}

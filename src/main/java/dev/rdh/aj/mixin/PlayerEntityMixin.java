@@ -14,11 +14,6 @@ public abstract class PlayerEntityMixin extends LivingEntity {
 
 	@Override
 	protected float getJumpVelocity() {
-		float f = super.getJumpVelocity();
-		if(AutoJump.isHjEnabled()) {
-			return f * 1.75F;
-		} else {
-			return f;
-		}
+		return AutoJump.HIGHJUMP.enabled() ? 0.8F : super.getJumpVelocity();
 	}
 }

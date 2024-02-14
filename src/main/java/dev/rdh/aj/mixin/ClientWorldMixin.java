@@ -12,6 +12,6 @@ import net.minecraft.client.world.ClientWorld;
 public class ClientWorldMixin {
 	@ModifyVariable(method = "spawnRandomParticles", at = @At("LOAD"))
 	private boolean injectBlockParticle(boolean value) {
-		return AutoJump.isSbEnabled() || value;
+		return AutoJump.SHOW_BARRIERS.enabled() || value;
 	}
 }

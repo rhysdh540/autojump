@@ -1,7 +1,7 @@
 {
   "key.aj.toggle_aj": "Toggle AutoJump",
-    "key.aj.toggle_hj": "Toggle HighJump",
-    "key.aj.toggle_iw": "Toggle InventoryWalk",
-    "key.aj.toggle_sb": "Toggle ShowBarriers",
-    "key.aj.toggle_nw": "Toggle NoWeb"
+  "key.aj.toggle_hj": "Activate HighJump",
+  "key.aj.toggle_iw": "Toggle InventoryWalk",
+  "key.aj.toggle_sb": "Toggle ShowBarriers",
+  "key.aj.toggle_nw": "Toggle NoWeb"
 }

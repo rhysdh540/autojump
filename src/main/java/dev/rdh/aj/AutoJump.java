@@ -1,10 +1,9 @@
 package dev.rdh.aj;
 
 import net.fabricmc.api.ClientModInitializer;
-import net.legacyfabric.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.legacyfabric.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import org.lwjgl.input.Keyboard;
 
+import dev.rdh.aj.Setting.ChatMessageSetting;
 import dev.rdh.aj.mixin.LivingEntityAccessor;
 
 import net.minecraft.client.MinecraftClient;
@@ -13,7 +12,6 @@ import net.minecraft.client.gui.screen.GameMenuScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.option.KeyBinding;
-import net.minecraft.text.LiteralText;
 
 import java.util.Arrays;
 import java.util.List;
@@ -21,93 +19,43 @@ import java.util.List;
 public class AutoJump implements ClientModInitializer {
 	private static final MinecraftClient MC = MinecraftClient.getInstance();
 
-	private static final KeyBinding AUTOJUMP = KeyBindingHelper.registerKeyBinding(new KeyBinding("key.aj.toggle_aj", Keyboard.KEY_BACKSLASH, "key.categories.movement"));
-	private static final KeyBinding INVWALK = KeyBindingHelper.registerKeyBinding(new KeyBinding("key.aj.toggle_iw", Keyboard.KEY_MINUS, "key.categories.movement"));
-	private static final KeyBinding HIGHJUMP = KeyBindingHelper.registerKeyBinding(new KeyBinding("key.aj.toggle_hj", Keyboard.KEY_EQUALS, "key.categories.movement"));
-	private static final KeyBinding SHOW_BARRIERS = KeyBindingHelper.registerKeyBinding(new KeyBinding("key.aj.toggle_sb", Keyboard.KEY_BACK, "key.categories.misc"));
-	private static final KeyBinding NOWEB = KeyBindingHelper.registerKeyBinding(new KeyBinding("key.aj.toggle_nw", Keyboard.KEY_SEMICOLON, "key.categories.movement"));
+	private static List<KeyBinding> keys = null;
 
-	private static boolean ajEnabled = false;
-	private static boolean iwEnabled = false;
-	private static boolean hjEnabled = false;
-	private static boolean sbEnabled = false;
-	private static boolean nwEnabled = false;
-
-	@Override
-	public void onInitializeClient() {
-		ClientTickEvents.START_WORLD_TICK.register(client -> {
-			if(AUTOJUMP.wasPressed()) {
-				ajEnabled = !ajEnabled;
-				String msg = "AutoJump: " + (ajEnabled ? "Enabled" : "Disabled");
-				MC.player.sendMessage(new LiteralText(msg));
-			}
-
-			if(INVWALK.wasPressed()) {
-				iwEnabled = !iwEnabled;
-				String msg = "InvWalk: " + (iwEnabled ? "Enabled" : "Disabled");
-				MC.player.sendMessage(new LiteralText(msg));
-			}
-
-			hj: if(HIGHJUMP.wasPressed()) {
-				if(((LivingEntityAccessor) MC.player).getJumpingCooldown() != 0 || !MC.player.onGround)
-					break hj;
-				hjEnabled = true;
-				MC.player.jump();
-				((LivingEntityAccessor) MC.player).setJumpingCooldown(10);
-				hjEnabled = false;
-			}
-
-			if(SHOW_BARRIERS.wasPressed()) {
-				sbEnabled = !sbEnabled;
-				String msg = "ShowBarriers: " + (sbEnabled ? "Enabled" : "Disabled");
-				MC.player.sendMessage(new LiteralText(msg));
-			}
-
-			if(NOWEB.wasPressed()) {
-				nwEnabled = !nwEnabled;
-				String msg = "NoWeb: " + (nwEnabled ? "Enabled" : "Disabled");
-				MC.player.sendMessage(new LiteralText(msg));
-			}
-
-			if(ajEnabled)
-				tickAutoJump();
-			if(iwEnabled)
-				tickInvWalk();
-		});
-	}
-
-	private void tickAutoJump() {
+	public static final Setting AUTOJUMP = new ChatMessageSetting("AutoJump", Keyboard.KEY_BACKSLASH, "movement", aj -> {
 		if(MC.player.onGround && !MC.player.isSneaking()
 				&& !MC.options.sneakKey.isPressed() && !MC.options.jumpKey.isPressed()
 				&& MC.world.doesBoxCollide(MC.player,
 				MC.player.getBoundingBox().offset(0.0, -0.5, 0.0).expand(-0.001, 0.0, -0.001)).isEmpty()) {
 			MC.player.jump();
 		}
-	}
-
-	public static boolean isHjEnabled() {
-		return hjEnabled;
-	}
-	public static boolean isSbEnabled() {
-		return sbEnabled;
-	}
-	public static boolean isNwEnabled() {
-		return nwEnabled;
-	}
-
-	private static List<KeyBinding> keys = null;
-
-	private void tickInvWalk() {
-		if(keys == null) {
-			keys = Arrays.asList(MC.options.forwardKey, MC.options.backKey, MC.options.leftKey, MC.options.rightKey, MC.options.jumpKey, MC.options.sneakKey, MC.options.sprintKey);
-		}
+	});
+	public static final Setting INVWALK = new ChatMessageSetting("InvWalk", Keyboard.KEY_MINUS, "movement", iw -> {
 		Screen screen = MC.currentScreen;
 		if(screen instanceof ChatScreen || screen instanceof GameMenuScreen) {
 			return;
 		}
 
+		if(keys == null) {
+			keys = Arrays.asList(MC.options.forwardKey, MC.options.backKey, MC.options.leftKey, MC.options.rightKey, MC.options.jumpKey, MC.options.sneakKey, MC.options.sprintKey);
+		}
+
 		for(KeyBinding key : keys) {
 			KeyBinding.setKeyPressed(key.getCode(), GameOptions.isPressed(key));
 		}
+	});
+	public static final Setting HIGHJUMP = new Setting("HighJump", Keyboard.KEY_EQUALS, "movement",
+			hj -> {
+				if(((LivingEntityAccessor) MC.player).getJumpingCooldown() != 0 || !MC.player.onGround)
+					return;
+				MC.player.jump();
+				((LivingEntityAccessor) MC.player).setJumpingCooldown(10);
+				hj.disable();
+			});
+	public static final Setting SHOW_BARRIERS = new ChatMessageSetting("ShowBarriers", Keyboard.KEY_BACK, "misc");
+	public static final Setting NOWEB = new ChatMessageSetting("NoWeb", Keyboard.KEY_SEMICOLON, "movement");
+
+	@Override
+	public void onInitializeClient() {
+
 	}
 }
