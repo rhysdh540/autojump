@@ -3,8 +3,6 @@ package dev.rdh.aj;
 import net.fabricmc.api.ClientModInitializer;
 import net.legacyfabric.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.legacyfabric.fabric.api.client.keybinding.v1.KeyBindingHelper;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.lwjgl.input.Keyboard;
 
 import dev.rdh.aj.mixin.LivingEntityAccessor;
@@ -27,13 +25,13 @@ public class AutoJump implements ClientModInitializer {
 	private static final KeyBinding INVWALK = KeyBindingHelper.registerKeyBinding(new KeyBinding("key.aj.toggle_iw", Keyboard.KEY_MINUS, "key.categories.movement"));
 	private static final KeyBinding HIGHJUMP = KeyBindingHelper.registerKeyBinding(new KeyBinding("key.aj.toggle_hj", Keyboard.KEY_EQUALS, "key.categories.movement"));
 	private static final KeyBinding SHOW_BARRIERS = KeyBindingHelper.registerKeyBinding(new KeyBinding("key.aj.toggle_sb", Keyboard.KEY_BACK, "key.categories.misc"));
+	private static final KeyBinding NOWEB = KeyBindingHelper.registerKeyBinding(new KeyBinding("key.aj.toggle_nw", Keyboard.KEY_SEMICOLON, "key.categories.movement"));
 
 	private static boolean ajEnabled = false;
 	private static boolean iwEnabled = false;
 	private static boolean hjEnabled = false;
 	private static boolean sbEnabled = false;
-
-	private static final Logger LOGGER = LogManager.getLogger("AutoJump");
+	private static boolean nwEnabled = false;
 
 	@Override
 	public void onInitializeClient() {
@@ -41,14 +39,12 @@ public class AutoJump implements ClientModInitializer {
 			if(AUTOJUMP.wasPressed()) {
 				ajEnabled = !ajEnabled;
 				String msg = "AutoJump: " + (ajEnabled ? "Enabled" : "Disabled");
-				LOGGER.info(msg);
 				MC.player.sendMessage(new LiteralText(msg));
 			}
 
 			if(INVWALK.wasPressed()) {
 				iwEnabled = !iwEnabled;
 				String msg = "InvWalk: " + (iwEnabled ? "Enabled" : "Disabled");
-				LOGGER.info(msg);
 				MC.player.sendMessage(new LiteralText(msg));
 			}
 
@@ -64,7 +60,12 @@ public class AutoJump implements ClientModInitializer {
 			if(SHOW_BARRIERS.wasPressed()) {
 				sbEnabled = !sbEnabled;
 				String msg = "ShowBarriers: " + (sbEnabled ? "Enabled" : "Disabled");
-				LOGGER.info(msg);
+				MC.player.sendMessage(new LiteralText(msg));
+			}
+
+			if(NOWEB.wasPressed()) {
+				nwEnabled = !nwEnabled;
+				String msg = "NoWeb: " + (nwEnabled ? "Enabled" : "Disabled");
 				MC.player.sendMessage(new LiteralText(msg));
 			}
 
@@ -89,6 +90,9 @@ public class AutoJump implements ClientModInitializer {
 	}
 	public static boolean isSbEnabled() {
 		return sbEnabled;
+	}
+	public static boolean isNwEnabled() {
+		return nwEnabled;
 	}
 
 	private static List<KeyBinding> keys = null;
