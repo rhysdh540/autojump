@@ -1,4 +1,3 @@
-import com.google.gson.Gson
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
 import xyz.wagyourtail.unimined.api.minecraft.task.RemapJarTask
@@ -30,6 +29,8 @@ repositories {
             includeGroup("com.github.bawnorton.mixinsquared")
         }
     }
+
+    flatDir { dirs("libs/runtime") }
 }
 
 base.archivesName = "archives_base_name"()
@@ -38,20 +39,7 @@ group = "maven_group"()
 
 val localRuntime: Configuration by configurations.creating
 val modCompileOnly: Configuration by configurations.creating
-
-configurations {
-    all {
-        resolutionStrategy.eachDependency {
-            if(requested.group == "org.lwjgl.lwjgl") {
-                useVersion("2.9.4+legacyfabric.8")
-            }
-            exclude(group = "net.java.jinput", module = "jinput-platform")
-        }
-    }
-
-    runtimeClasspath.get().extendsFrom(localRuntime)
-    compileClasspath.get().extendsFrom(modCompileOnly)
-}
+val nothing: Configuration by configurations.creating
 
 unimined.minecraft {
     version("minecraft_version"())
@@ -74,6 +62,22 @@ unimined.minecraft {
     mods {
         remap(modCompileOnly)
     }
+}
+
+configurations {
+    "minecraftLibraries" {
+        resolutionStrategy.eachDependency {
+            if(requested.group == "org.lwjgl.lwjgl") {
+                useVersion("2.9.4+legacyfabric.8")
+            }
+            if(requested.group == "net.java.jinput" && requested.name == "jinput-platform") {
+                useTarget("runtime:jinput-platform:2.0.5")
+            }
+        }
+    }
+
+    runtimeClasspath.get().extendsFrom(localRuntime)
+    compileClasspath.get().extendsFrom(modCompileOnly)
 }
 
 dependencies {
@@ -111,7 +115,7 @@ tasks.assemble {
 tasks.named<RemapJarTask>("remapJar") {
     destinationDirectory = file("/Users/rhys/games/prism/instances/legacyfabric-1.8.9-loader.0.14.22/.minecraft/mods")
     doLast {
-        squishJar(archiveFile.get().asFile)
+//        squishJar(archiveFile.get().asFile)
     }
 }
 
@@ -128,30 +132,30 @@ operator fun String.invoke(): String {
             ?: throw IllegalStateException("Property $this is not defined")
 }
 
-fun squishJar(jar: File) {
-    val contents = linkedMapOf<String, ByteArray>()
-    JarFile(jar).use {
-        it.entries().asIterator().forEach { entry ->
-            if (!entry.isDirectory) {
-                contents[entry.name] = it.getInputStream(entry).readAllBytes()
-            }
-        }
-    }
-
-    jar.delete()
-
-    JarOutputStream(jar.outputStream()).use { out ->
-        out.setLevel(Deflater.BEST_COMPRESSION)
-        contents.forEach { var (name, data) = it
-            if (name.endsWith(".json") || name.endsWith(".mcmeta")) {
-                data = (JsonOutput.toJson(JsonSlurper().parse(data)).toByteArray())
-            }
-
-            out.putNextEntry(JarEntry(name))
-            out.write(data)
-            out.closeEntry()
-        }
-        out.finish()
-        out.close()
-    }
-}
+//fun squishJar(jar: File) {
+//    val contents = linkedMapOf<String, ByteArray>()
+//    JarFile(jar).use {
+//        it.stream().forEach { entry ->
+//            if (!entry.isDirectory) {
+//                contents[entry.name] = it.getInputStream(entry).readAllBytes()
+//            }
+//        }
+//    }
+//
+//    jar.delete()
+//
+//    JarOutputStream(jar.outputStream()).use { out ->
+//        out.setLevel(Deflater.BEST_COMPRESSION)
+//        contents.forEach { var (name, data) = it
+//            if (name.endsWith(".json") || name.endsWith(".mcmeta")) {
+//                data = (JsonOutput.toJson(JsonSlurper().parse(data)).toByteArray())
+//            }
+//
+//            out.putNextEntry(JarEntry(name))
+//            out.write(data)
+//            out.closeEntry()
+//        }
+//        out.finish()
+//        out.close()
+//    }
+//}

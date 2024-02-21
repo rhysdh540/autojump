@@ -10,6 +10,7 @@ import net.minecraft.text.LiteralText;
 
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.regex.Pattern;
 
 public class Setting {
 	private static final MinecraftClient MC = MinecraftClient.getInstance();
@@ -20,12 +21,14 @@ public class Setting {
 
 	private final BiConsumer<Setting, ClientWorld> action;
 
+	private static final Pattern UPPERCASE_ONLY = Pattern.compile("[^A-Z]");
+
 	public Setting(String name, int keyCode, String category, BiConsumer<Setting, ClientWorld> action) {
 		this.name = name;
 		this.enabled = false;
 		this.action = action;
 
-		String key = name.replaceAll("[^A-Z]", "").toLowerCase();
+		String key = UPPERCASE_ONLY.matcher(name.toUpperCase()).replaceAll("").toLowerCase();
 		key = "key.aj.toggle_" + key;
 
 		this.keyBinding = KeyBindingHelper.registerKeyBinding(new KeyBinding(key, keyCode, "key.categories." + category));

@@ -6,9 +6,9 @@
   "client": [
     "FeatureDisablerMixin",
     "KeyBindingMixinSquared",
-    "LivingEntityAccessor",
     "PlayerEntityMixin",
-    "CobwebBlockMixin"
+    "CobwebBlockMixin",
+    "LivingEntityMixin"
   ],
   "injectors": {
     "defaultRequire": 1
