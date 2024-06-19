@@ -8,7 +8,9 @@
     "KeyBindingMixinSquared",
     "PlayerEntityMixin",
     "CobwebBlockMixin",
-    "LivingEntityMixin"
+    "LivingEntityMixin",
+    "GameRendererMixin",
+    "ClientPlayerEntityMixin"
   ],
   "injectors": {
     "defaultRequire": 1

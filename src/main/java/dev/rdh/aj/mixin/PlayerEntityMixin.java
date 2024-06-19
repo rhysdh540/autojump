@@ -1,7 +1,8 @@
 package dev.rdh.aj.mixin;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
+import org.spongepowered.asm.mixin.injection.At;
 
 import dev.rdh.aj.AutoJump;
 
@@ -16,5 +17,12 @@ public abstract class PlayerEntityMixin extends LivingEntity {
 	@Override
 	protected float getJumpVelocity() {
 		return AutoJump.HIGHJUMP.enabled() ? 0.8F : super.getJumpVelocity();
+	}
+
+	@ModifyExpressionValue(method = "attack", at =
+			@At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;hasStatusEffect(Lnet/minecraft/entity/effect/StatusEffect;)Z", ordinal = 0)
+	)
+	private boolean idkWhatThisDoesButIShouldProbablyTurnItOff(boolean original) {
+		return !AutoJump.ANTIBLINDNESS.enabled() && original;
 	}
 }

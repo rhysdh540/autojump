@@ -115,7 +115,7 @@ tasks.assemble {
 tasks.named<RemapJarTask>("remapJar") {
     destinationDirectory = file("/Users/rhys/games/prism/instances/legacyfabric-1.8.9-loader.0.14.22/.minecraft/mods")
     doLast {
-//        squishJar(archiveFile.get().asFile)
+        squishJar(archiveFile.get().asFile)
     }
 }
 
@@ -132,30 +132,30 @@ operator fun String.invoke(): String {
             ?: throw IllegalStateException("Property $this is not defined")
 }
 
-//fun squishJar(jar: File) {
-//    val contents = linkedMapOf<String, ByteArray>()
-//    JarFile(jar).use {
-//        it.stream().forEach { entry ->
-//            if (!entry.isDirectory) {
-//                contents[entry.name] = it.getInputStream(entry).readAllBytes()
-//            }
-//        }
-//    }
-//
-//    jar.delete()
-//
-//    JarOutputStream(jar.outputStream()).use { out ->
-//        out.setLevel(Deflater.BEST_COMPRESSION)
-//        contents.forEach { var (name, data) = it
-//            if (name.endsWith(".json") || name.endsWith(".mcmeta")) {
-//                data = (JsonOutput.toJson(JsonSlurper().parse(data)).toByteArray())
-//            }
-//
-//            out.putNextEntry(JarEntry(name))
-//            out.write(data)
-//            out.closeEntry()
-//        }
-//        out.finish()
-//        out.close()
-//    }
-//}
+fun squishJar(jar: File) {
+    val contents = linkedMapOf<String, ByteArray>()
+    JarFile(jar).use {
+        it.stream().forEach { entry ->
+            if (!entry.isDirectory) {
+                contents[entry.name] = it.getInputStream(entry).readAllBytes()
+            }
+        }
+    }
+
+    jar.delete()
+
+    JarOutputStream(jar.outputStream()).use { out ->
+        out.setLevel(Deflater.BEST_COMPRESSION)
+        contents.forEach { var (name, data) = it
+            if (name.endsWith(".json") || name.endsWith(".mcmeta")) {
+                data = (JsonOutput.toJson(JsonSlurper().parse(data)).toByteArray())
+            }
+
+            out.putNextEntry(JarEntry(name))
+            out.write(data)
+            out.closeEntry()
+        }
+        out.finish()
+        out.close()
+    }
+}

@@ -75,6 +75,8 @@ public class AutoJump implements ClientModInitializer {
 
 	public static final Setting NOWEB = new ChatMessageSetting("NoWeb", Keyboard.KEY_SEMICOLON, "movement");
 
+	public static final Setting ANTIBLINDNESS = new ChatMessageSetting("AntiBlindness", Keyboard.KEY_L, "misc");
+
 	@Override
 	public void onInitializeClient() {
 		System.out.println("AutoJump initialized");
