@@ -70,7 +70,8 @@ configurations {
             if(requested.group == "org.lwjgl.lwjgl") {
                 useVersion("2.9.4+legacyfabric.8")
             }
-            if(requested.group == "net.java.jinput" && requested.name == "jinput-platform") {
+            if(requested.group == "net.java.jinput" && requested.name == "jinput-platform" && requested.version == "2.0.5"
+                && System.getProperty("os.name").lowercase().contains("mac")) {
                 useTarget("runtime:jinput-platform:2.0.5")
             }
         }
