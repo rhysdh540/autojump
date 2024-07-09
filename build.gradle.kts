@@ -114,7 +114,9 @@ tasks.assemble {
 }
 
 tasks.named<RemapJarTask>("remapJar") {
-    destinationDirectory = file("/Users/rhys/games/prism/instances/legacyfabric-1.8.9-loader.0.14.22/.minecraft/mods")
+    if(System.getProperty("user.home").equals("/Users/rhys")) {
+        destinationDirectory = file("/Users/rhys/games/prism/instances/legacyfabric-1.8.9-loader.0.14.22/.minecraft/mods")
+    }
     doLast {
         squishJar(archiveFile.get().asFile)
     }
