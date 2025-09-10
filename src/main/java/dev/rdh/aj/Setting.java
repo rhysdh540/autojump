@@ -1,19 +1,21 @@
 package dev.rdh.aj;
 
-import net.legacyfabric.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.legacyfabric.fabric.api.client.keybinding.v1.KeyBindingHelper;
-
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.option.KeyBinding;
+import net.minecraftforge.fml.client.registry.ClientRegistry;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.options.KeyBinding;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.text.LiteralText;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
 
 public class Setting {
-	private static final MinecraftClient MC = MinecraftClient.getInstance();
+	private static final Minecraft MC = Minecraft.getInstance();
+
+	public static final List<Consumer<ClientWorld>> WORLD_TICKERS = new ArrayList<>();
 
 	public final String name;
 	public final KeyBinding keyBinding;
@@ -31,9 +33,10 @@ public class Setting {
 		String key = UPPERCASE_ONLY.matcher(name).replaceAll("").toLowerCase();
 		key = "key.aj.toggle_" + key;
 
-		this.keyBinding = KeyBindingHelper.registerKeyBinding(new KeyBinding(key, keyCode, "key.categories." + category));
+		this.keyBinding = new KeyBinding(key, keyCode, "key.categories." + category);
+		ClientRegistry.registerKeyBinding(this.keyBinding);
 
-		ClientTickEvents.START_WORLD_TICK.register(this::tick);
+		WORLD_TICKERS.add(this::tick);
 	}
 
 	public Setting(String name, int keyCode, String category, Consumer<Setting> action) {
@@ -45,7 +48,7 @@ public class Setting {
 	}
 
 	public boolean pressed() {
-		return this.keyBinding.wasPressed();
+		return this.keyBinding.consumeClick();
 	}
 
 	public boolean held() {

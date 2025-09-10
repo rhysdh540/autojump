@@ -9,7 +9,6 @@ import java.util.jar.JarOutputStream
 import java.util.zip.Deflater
 
 plugins {
-    java
     id("xyz.wagyourtail.unimined") version("1.3.15-SNAPSHOT")
 }
 
@@ -20,17 +19,13 @@ javaToolchains {
 }
 
 repositories {
-    mavenCentral {
-        content {
-            excludeGroup("ca.weblite")
-        }
-    }
-
     maven("https://jitpack.io") {
         content {
             includeGroup("com.github.bawnorton.mixinsquared")
         }
     }
+
+    unimined.legacyFabricMaven()
 
     flatDir { dirs("libs/runtime") }
 }
@@ -41,7 +36,6 @@ group = "maven_group"()
 
 val localRuntime: Configuration by configurations.creating
 val modCompileOnly: Configuration by configurations.creating
-val nothing: Configuration by configurations.creating
 
 unimined.minecraft {
     version("minecraft_version"())
@@ -52,13 +46,31 @@ unimined.minecraft {
         }
     }
 
-    legacyFabric {
-        loader("fabric_loader_version"())
+    minecraftForge {
+        loader("forge_version"() + "-" + version)
+        atDependency = dependencies.create("net.neoforged:accesstransformers:9.0.3")
+        atMainClass = "net.neoforged.accesstransformer.TransformerProcessor"
     }
 
     mappings {
-        legacyIntermediary()
-        legacyYarn(build = "yarn_build"())
+        calamus()
+        feather(28)
+
+        stub.withMappings("searge", "intermediary") {
+            c("va", listOf(
+                "net/minecraft/entity/item/EntityMinecart",
+                "net/minecraft/entity/vehicle/MinecartEntity"
+            )) {
+                m("getMaxSpeed", "()D", "m_9076954", "getMaxSpeedForge")
+            }
+
+            c("cx", listOf(
+                "net/minecraft/util/RegistryNamespaced",
+                "net/minecraft/util/registry/IdRegistry"
+            )) {
+                m("func_148757_b", "(Ljava/lang/Object;)I", "getByValue")
+            }
+        }
     }
 
     mods {
@@ -70,7 +82,7 @@ configurations {
     "minecraftLibraries" {
         resolutionStrategy.eachDependency {
             if(requested.group == "org.lwjgl.lwjgl") {
-                useVersion("2.9.4+legacyfabric.8")
+                useVersion("2.9.4+legacyfabric.10")
             }
             if(requested.group == "net.java.jinput" && requested.name == "jinput-platform" && requested.version == "2.0.5"
                 && System.getProperty("os.name").lowercase().contains("mac")) {
@@ -84,21 +96,20 @@ configurations {
 }
 
 dependencies {
-    "modImplementation"("net.legacyfabric.legacy-fabric-api:legacy-fabric-api:${"fabric_api_version"()}+${"minecraft_version"()}")
-
-    modCompileOnly(fileTree("libs/compile") { include("*.jar") })
     localRuntime(fileTree("libs/runtime") { include("*.jar") })
     "com.github.bawnorton.mixinsquared:mixinsquared-fabric:0.1.1".apply {
         implementation(this)
         annotationProcessor(this)
-        "include"(this)
     }
+
+    compileOnly("org.spongepowered:mixin:0.8.7")
+    compileOnly("io.github.llamalad7:mixinextras-common:0.5.0")
 }
 
 tasks.processResources {
     inputs.property("version", project.version)
 
-    filesMatching("fabric.mod.json") {
+    filesMatching("mcmod.info") {
         expand("version" to project.version)
     }
 }
@@ -119,9 +130,19 @@ tasks.named<RemapJarTask>("remapJar") {
     if(System.getProperty("user.home").equals("/Users/rhys")) {
         asJar.destinationDirectory = file("/Users/rhys/games/prism/instances/pvp/minecraft/mods")
     }
+
     mixinRemap {
         disableRefmap()
+        enableMixinExtra()
     }
+
+    asJar.manifest.attributes(
+        "MixinConfigs" to "aj.mixins.json",
+        "FMLCorePluginContainsFMLMod" to true,
+        "ForceLoadAsMod" to true,
+        "TweakClass" to "org.spongepowered.asm.launch.MixinTweaker",
+    )
+
     doLast {
         squishJar(asJar.archiveFile.get().asFile)
     }

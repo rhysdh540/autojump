@@ -1,0 +1,8 @@
+[{
+  "modid": "aj",
+  "name": "Autojump",
+  "description": "park our",
+  "version": "${version}",
+  "mcversion": "1.8.9",
+  "authorList": ["rdh"]
+}]

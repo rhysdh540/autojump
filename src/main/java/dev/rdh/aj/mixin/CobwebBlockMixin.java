@@ -7,7 +7,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import dev.rdh.aj.AutoJump;
 
-import net.minecraft.block.BlockState;
+import net.minecraft.block.state.BlockState;
 import net.minecraft.block.CobwebBlock;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;

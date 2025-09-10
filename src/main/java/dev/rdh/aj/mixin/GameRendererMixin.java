@@ -10,7 +10,7 @@ import net.minecraft.client.render.GameRenderer;
 
 @Mixin(GameRenderer.class)
 public class GameRendererMixin {
-	@ModifyExpressionValue(method = "renderFog", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;hasStatusEffect(Lnet/minecraft/entity/effect/StatusEffect;)Z", ordinal = 0))
+	@ModifyExpressionValue(method = "renderFog", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/living/LivingEntity;hasStatusEffect(Lnet/minecraft/entity/living/effect/StatusEffect;)Z", ordinal = 0))
 	private boolean disableBlindnessFog(boolean original) {
 		return original && !AutoJump.ANTIBLINDNESS.enabled();
 	}
