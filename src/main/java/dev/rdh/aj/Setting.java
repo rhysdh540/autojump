@@ -28,7 +28,7 @@ public class Setting {
 		this.enabled = false;
 		this.action = action;
 
-		String key = UPPERCASE_ONLY.matcher(name.toUpperCase()).replaceAll("").toLowerCase();
+		String key = UPPERCASE_ONLY.matcher(name).replaceAll("").toLowerCase();
 		key = "key.aj.toggle_" + key;
 
 		this.keyBinding = KeyBindingHelper.registerKeyBinding(new KeyBinding(key, keyCode, "key.categories." + category));

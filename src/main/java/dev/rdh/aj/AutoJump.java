@@ -1,6 +1,7 @@
 package dev.rdh.aj;
 
 import net.fabricmc.api.ClientModInitializer;
+import net.legacyfabric.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import org.lwjgl.input.Keyboard;
 
 import dev.rdh.aj.Setting.ChatMessageSetting;
@@ -19,6 +20,12 @@ import java.util.List;
 
 public class AutoJump implements ClientModInitializer {
 	private static final MinecraftClient MC = MinecraftClient.getInstance();
+
+	public static final KeyBinding ATTACK_2 = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+			"key.aj.attack2",
+			Keyboard.KEY_LBRACKET,
+			"key.categories.gameplay"
+	));
 
 	private static List<KeyBinding> keys = null;
 

@@ -1,3 +1,5 @@
+@file:Suppress("UnstableApiUsage")
+
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
 import xyz.wagyourtail.unimined.api.minecraft.task.RemapJarTask
@@ -8,7 +10,7 @@ import java.util.zip.Deflater
 
 plugins {
     java
-    id("xyz.wagyourtail.unimined") version("1.2.0-SNAPSHOT")
+    id("xyz.wagyourtail.unimined") version("1.3.15-SNAPSHOT")
 }
 
 javaToolchains {
@@ -46,7 +48,7 @@ unimined.minecraft {
 
     runs {
         config("server") {
-            disabled = true
+            enabled = false
         }
     }
 
@@ -115,10 +117,13 @@ tasks.assemble {
 
 tasks.named<RemapJarTask>("remapJar") {
     if(System.getProperty("user.home").equals("/Users/rhys")) {
-        destinationDirectory = file("/Users/rhys/games/prism/instances/legacyfabric-1.8.9-loader.0.14.22/.minecraft/mods")
+        asJar.destinationDirectory = file("/Users/rhys/games/prism/instances/pvp/minecraft/mods")
+    }
+    mixinRemap {
+        disableRefmap()
     }
     doLast {
-        squishJar(archiveFile.get().asFile)
+        squishJar(asJar.archiveFile.get().asFile)
     }
 }
 

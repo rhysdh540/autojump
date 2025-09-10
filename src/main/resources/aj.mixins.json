@@ -4,13 +4,9 @@
   "package": "dev.rdh.aj.mixin",
   "compatibilityLevel": "JAVA_8",
   "client": [
-    "FeatureDisablerMixin",
-    "KeyBindingMixinSquared",
-    "PlayerEntityMixin",
-    "CobwebBlockMixin",
-    "LivingEntityMixin",
-    "GameRendererMixin",
-    "ClientPlayerEntityMixin"
+    "ClientPlayerEntityMixin", "ClientWorldMixin", "CobwebBlockMixin", "FeatureDisablerMixin", "GameRendererMixin",
+    "KeyBindingMixinSquared", "LivingEntityMixin", "LivingEntityRendererMixin", "MinecraftClientMixin",
+    "PlayerEntityMixin"
   ],
   "injectors": {
     "defaultRequire": 1
